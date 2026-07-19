@@ -10,16 +10,18 @@ const options = {
       description:
         'REST API for tracking vehicles, pings, provinces, districts, and stations.\n\n' +
         '**NIBM Index:** COBSCCOMP251P-034\n\n' +
-        '**Protected endpoints** require the header `X-API-Key: key_v01`.',
+        '**Protected endpoints** require a Bearer JWT. ' +
+        'Register via `POST /v1/api/auth/register`, then login via `POST /v1/api/auth/login` ' +
+        'to obtain a token and click **Authorize**.',
     },
     servers: [{ url: 'http://localhost:5000', description: 'Development server' }],
     components: {
       securitySchemes: {
-        ApiKeyAuth: {
-          type:        'apiKey',
-          in:          'header',
-          name:        'X-API-Key',
-          description: 'Value: `key_v01`',
+        BearerAuth: {
+          type:         'http',
+          scheme:       'bearer',
+          bearerFormat: 'JWT',
+          description:  'JWT obtained from POST /v1/api/auth/login',
         },
       },
       schemas: {
@@ -103,6 +105,40 @@ const options = {
             success: { type: 'boolean', example: false },
             message: { type: 'string',  example: 'Resource not found' },
             errors:  { type: 'array', items: { type: 'string' } },
+          },
+        },
+        RegisterBody: {
+          type:     'object',
+          required: ['username', 'email', 'password'],
+          properties: {
+            username: { type: 'string', minLength: 3, example: 'officer_silva' },
+            email:    { type: 'string', format: 'email', example: 'silva@police.lk' },
+            password: { type: 'string', minLength: 6, example: 'secret123' },
+            role:     { type: 'string', enum: ['admin', 'officer'], default: 'officer', example: 'officer' },
+          },
+        },
+        LoginBody: {
+          type:     'object',
+          required: ['email', 'password'],
+          properties: {
+            email:    { type: 'string', format: 'email', example: 'silva@police.lk' },
+            password: { type: 'string', example: 'secret123' },
+          },
+        },
+        UserProfile: {
+          type: 'object',
+          properties: {
+            id:       { type: 'string', example: '6853f4c0a1b2c3d4e5f6a7b8' },
+            username: { type: 'string', example: 'officer_silva' },
+            email:    { type: 'string', example: 'silva@police.lk' },
+            role:     { type: 'string', enum: ['admin', 'officer'], example: 'officer' },
+          },
+        },
+        AuthResponse: {
+          type: 'object',
+          properties: {
+            token: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
+            user:  { $ref: '#/components/schemas/UserProfile' },
           },
         },
       },
