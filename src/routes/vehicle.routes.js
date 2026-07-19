@@ -6,7 +6,7 @@ const {
   getVehicleLastPosition,
 }                            = require('../controllers/vehicle.controller');
 const { createPing }         = require('../controllers/ping.controller');
-const { requireApiKey }      = require('../middlewares/auth.middleware');
+const { requireAuth }        = require('../middlewares/auth.middleware');
 const { validate }           = require('../middlewares/validation.middleware');
 const { validateCreatePing } = require('../validators/ping.validator');
 
@@ -159,7 +159,7 @@ router.get('/:vehicleId/last-position', getVehicleLastPosition);
  *     description: Records a new GPS position for the vehicle. Returns `201 Created` with a `Location` header pointing to the new ping.
  *     tags: [Vehicles]
  *     security:
- *       - ApiKeyAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: vehicleId
@@ -214,6 +214,6 @@ router.get('/:vehicleId/last-position', getVehicleLastPosition);
  *             schema:
  *               $ref: '#/components/schemas/ApiError'
  */
-router.post('/:vehicleId/pings', requireApiKey, validate(validateCreatePing), createPing);
+router.post('/:vehicleId/pings', requireAuth, validate(validateCreatePing), createPing);
 
 module.exports = router;
