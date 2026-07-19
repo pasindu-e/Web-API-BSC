@@ -1,12 +1,21 @@
+const jwt             = require('jsonwebtoken');
 const ApiError        = require('../utils/ApiError');
-const { API_KEY }     = require('../config/env');
+const { JWT_SECRET }  = require('../config/env');
 const { HTTP_STATUS } = require('../utils/constants');
 
-const requireApiKey = (req, res, next) => {
-  if (req.headers['x-api-key'] !== API_KEY) {
-    return next(new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Unauthorized: invalid or missing API key'));
+const requireAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next(new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Unauthorized: missing or invalid token'));
   }
-  next();
+
+  const token = authHeader.slice(7);
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    next(new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Unauthorized: invalid or expired token'));
+  }
 };
 
-module.exports = { requireApiKey };
+module.exports = { requireAuth };
