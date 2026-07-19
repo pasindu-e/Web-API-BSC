@@ -1,6 +1,6 @@
 # Sri Lanka Police Tuk-Tuk Monitoring API
 
-**NIBM Index:** COBSCCOMP251P-034  
+**NIBM Index:** COBSCCOMP251P-001  
 A REST API for tracking vehicles, GPS pings, provinces, districts, and police stations across Sri Lanka.
 
 ---
